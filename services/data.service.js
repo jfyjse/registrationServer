@@ -10,7 +10,7 @@ const signup = (fname, lname, email, password, city) => {
       return {
         status: false,
         message: "email already exists please login",
-        statusCode: 420,
+        statusCode: 422,
       };
     } else {
       const newUser = new db.User({
@@ -32,11 +32,11 @@ const signup = (fname, lname, email, password, city) => {
   });
 };
 
-const login = (email, password) => {
+const login = (req, email, password) => {
   console.log("login called");
-  return db.User.findOne({ email, password: password }).then((loginn) => {
-    if (loginn) {
-      // req.session.currentUser = loginn.email
+  return db.User.findOne({ email, password: password }).then((result) => {
+    if (result) {
+      req.session.currentUser = result.email
       return {
         status: true,
         message: "login success",
@@ -46,15 +46,39 @@ const login = (email, password) => {
       return {
         status: false,
         message: "invalid creds",
-        statusCode: 420,
+        statusCode: 422,
       };
     }
   });
 };
 
-
+const getData=(email)=>{
+  return db.User.findOne({email}).then((result)=>{
+    if(result){
+      return{
+        status :true,
+        statusCode:200,
+        fname:result.fname,
+        lname:result.lname,
+        city:result.city
+  
+      }
+    }
+else{
+  return{
+    status:false,
+    statusCode: 422,
+    message: "no data found"
+    
+  }
+}
+    
+  })
+  
+}
 
 module.exports = {
   signup,
   login,
+  getData
 };
